@@ -56,3 +56,124 @@ apply(x, 1, plot)
 
 resultapply <- apply(x, 1, mean)
 resultapply
+
+
+# Aplicando apply() a um Dataframe
+escola <- data.frame(Aluno = c('Bob', 'Tereza', 'Marta', 'Felipe', 'Zacarias', 'Elton'),
+                     Fisica = c(91, 82, 75, 97, 62, 74),
+                     Matematica = c(99, 100, 86, 92, 91, 87),
+                     Quimica = c(56, 72, 49, 68, 59, 77))
+
+escola
+escola$Matematica
+
+# Calculando a média por aluno
+escola$Media = NA
+escola
+
+escola$Media = apply(escola[,c(2, 3, 4)], 1, mean)
+escola
+escola$Media = round(escola$Media, digits = 2)
+escola
+?round
+
+
+# tapply()
+?gl
+#Criando datasets com valores aleatórios para realização de testes
+tabela_basquete <-
+  data.frame(equipe = gl(5, 5, labels = paste("Equipe", LETTERS[1:5])),
+             jogador = sample(letters, 25),
+             num_cestas = floor(runif(25, min=0, max=50)))
+
+View(tabela_basquete)
+summary(tabela_basquete)
+
+# Como calcular o total de cestas por Equipe?
+
+# tapply() vs sqldf
+install.packages('sqldf')
+library(sqldf)
+
+sqldf("select equipe, sum(num_cestas) from tabela_basquete group by equipe")
+
+?tapply
+tapply(tabela_basquete$num_cestas, tabela_basquete$equipe, sum)
+tapply(tabela_basquete$num_cestas, tabela_basquete$equipe, mean)
+
+# by
+?by
+
+dat <- data.frame(species=c(rep(c(1,2,3), each=5)), 
+                  petal.length=c(rnorm(5, 4.5, 1), 
+                                 rnorm(5, 4.5, 1), 
+                                 rnorm(5, 5.5, 1)), 
+                  petal.width=c(rnorm(5, 2.5, 1), 
+                                rnorm(5, 2.5, 1), 
+                                rnorm(5, 4, 1)))
+
+dat$species <- factor(dat$species)
+View(dat)
+
+by(dat, dat$species, function(x){
+  # calcular o comprimento médio da pétala para cada espécie
+  mean.pl <- mean(x$petal.length)
+})
+
+
+# lapply()
+?lapply
+
+lista1 <- list(a = (1:10), b = (45:77))
+lista1
+#Soma todos os elementos do vetor
+lapply(lista1, sum)
+
+#Soma todos os elementos de um vetor, separado pela categoria 
+sapply(lista1, sum)
+
+
+# vapply()
+#Aplica uma função a uma lista ou vetor
+?vapply
+
+# A função fivenum() retorna 5 estatísticas do conjunto de dados: (minimum, lower-hinge, median, upper-hinge, maximum) 
+# https://stat.ethz.ch/R-manual/R-patched/library/stats/html/fivenum.html
+vapply(lista1, 
+       fivenum, 
+       c(Min. = 0, 
+         "1stQu." = 0, 
+         Median = 0, 
+         "3rd Qu." = 0, 
+         Max = 0))
+
+
+# replicate
+#Aplica uma função a uma lista ou vetor
+?replicate
+replicate(7, runif(10))
+
+
+# mapply()
+#Aplica uma função a uma lista ou vetor com multiplos argumentos
+?mapply
+mapply(rep, 1:4, 4:1)
+
+
+# rapply()
+#Função recursiva
+?rapply
+
+lista2 <- list(a = c(1:5), b = c(6:10))
+lista2
+
+rapply(lista2, sum)
+rapply(lista2, sum, how = "list")
+
+
+
+
+
+
+
+

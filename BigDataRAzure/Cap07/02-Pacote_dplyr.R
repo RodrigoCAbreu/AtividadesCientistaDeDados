@@ -53,6 +53,7 @@ filter(sono_df, cidade %in% c("Recife", "Curitiba"))
 # arrange(), ordenação pela coluna cidade (alfabética)
 sono_df %>% arrange(cidade) %>% head
 
+#Selecionando as colunas e ordenando por cidade sono total
 sono_df %>% 
   select(nome, cidade, sono_total) %>%
   arrange(cidade, sono_total) %>% 
@@ -68,7 +69,7 @@ sono_df %>%
   arrange(cidade, desc(sono_total)) %>% 
   filter(sono_total >= 16)
 
-
+#Cria uma nova coluna em tempo de execução
 # mutate()
 head(sono_df)
 sono_df %>% 
@@ -85,6 +86,7 @@ sono_df %>%
 
 
 # summarize()
+# calcula a média do sono_total
 sono_df %>% 
   summarise(media_sono = mean(sono_total))
 
@@ -92,7 +94,7 @@ sono_df %>%
   summarise(media_sono = mean(sono_total), 
             min_sono = min(sono_total),
             max_sono = max(sono_total),
-            total = n())
+            total = n()) #total de registros
 
 
 # group_by()

@@ -25,8 +25,15 @@ View(flights)
 # Os dados devem ser extraídos do dataset flights para construir o dataset pop_data
 # Vamos considerar este dataset como sendo nossa população de voos
 
-pop_data <- select(flights, carrier, arr_delay)%>%filter(carrier == "UA" | carrier == "DL")
+pop_data <- select(flights, carrier, arr_delay)%>%filter(carrier == "UA" | carrier == "DL", arr_delay >=0)
 View(pop_data)
+
+pop_data = na.omit(flights) %>%  #omite valores nulos
+  filter(carrier == 'UA' | carrier == 'DL', arr_delay >= 0) %>%
+  select(carrier, arr_delay) %>%
+  group_by(carrier) %>%
+  sample_n(17000) %>%
+  ungroup()
 
 # Exercício 2  - Crie duas amostras de 1000 observações cada uma a partir do 
 # dataset pop_data apenas com dados da companhia DL para amostra 1 e apenas dados 
@@ -41,6 +48,12 @@ amostra2 <- sample_n(pop_data, size = 1000)%>%filter(carrier == "UA")%>%mutate(s
 
 # Exercício 3 - Crie um dataset contendo os dados das 2 amostras criadas no item anterior. 
 
+View(amostra1)
+class(amostra1)
+?cbind
+
+df_amostras <- rbind.data.frame(amostra1,amostra2)
+View(df_amostras)
 
 # Exercício 4 - Calcule o intervalo de confiança (95%) da amostra1
 
@@ -71,27 +84,98 @@ erro_padrao_amostra1 = sd(amostra1$arr_delay) / sqrt(nrow(amostra1))
 # Limites inferior e superior
 # 1.96 é o valor de z score para 95% de confiança
 
+lower = mean(amostra1$arr_delay)-1.96*erro_padrao_amostra1
+upper = mean(amostra1$arr_delay)+1.96*erro_padrao_amostra1
 
 # Intervalo de confiança
 
+mean(amostra1$arr_delay)
+ic_1 = c(lower,upper)
+mean(amostra1$arr_delay)
+ic_1
 
 
 # Exercício 5 - Calcule o intervalo de confiança (95%) da amostra2
 
+# Erro padrão
+erro_padrao_amostra2 = sd(amostra2$arr_delay) / sqrt(nrow(amostra2))
+
+# Limites inferior e superior
+# 1.96 é o valor de z score para 95% de confiança
+
+lower = mean(amostra2$arr_delay)-1.96*erro_padrao_amostra2
+upper = mean(amostra2$arr_delay)+1.96*erro_padrao_amostra2
+
+# Intervalo de confiança
+
+mean(amostra2$arr_delay)
+ic_2 = c(lower,upper)
+mean(amostra2$arr_delay)
+ic_2
 
 
 # Exercício 6 - Crie um plot Visualizando os intervalos de confiança criados nos itens anteriores
 # Dica: Use o geom_point() e geom_errorbar() do pacote ggplot2
 
+toPlot = summarise(group_by(df_amostras, sample_id), mean = mean(arr_delay))
+toPlot = mutate(toPlot, lower = ifelse(toPlot$sample_id == 1,ic_1[1],ic_2[1]))
+toPlot = mutate(toPlot, upper = ifelse(toPlot$sample_id == 1,ic_1[2],ic_2[2]))
+ggplot(toPlot, aes(x = sample_id, y=mean, colour = sample_id )) + 
+  geom_point() +
+  geom_errorbar(aes(ymin=lower, ymax=upper), width=.1)
 
 
 # Exercício 7 - Podemos dizer que muito provavelmente, as amostras vieram da mesma população? 
 # Por que?
 
-
+# Sim. A maior parte dos dados reside no mesmo intervalo de confiança nas duas amostras.
 
 # Exercício 8 - Crie um teste de hipótese para verificar se os voos da Delta Airlines (DL)
 # atrasam mais do que os voos da UA (United Airlines)
 
 # H0 e H1 devem ser mutuamente exclusivas.
+
+# H0 = Não há diferença significativa entre os atrasos da DL e UA (diff da média de atrasos = 0).
+# H1 = Delta atrasa mais (diff das médias > 0).
+
+# Criar as amostras
+dl <- sample_n(filter(pop_data, carrier == "DL", arr_delay > 0), 1000)
+ua <- sample_n(filter(pop_data, carrier == "UA", arr_delay > 0), 1000)
+
+# Calcula erro padrão e média
+se = sd(dl$arr_delay) / sqrt(nrow(dl))
+mean(dl$arr_delay)
+
+# Limites inferior e superior
+lower = mean(dl$arr_delay) - 1.96 * se
+upper = mean(dl$arr_delay) + 1.96 * se
+ic_dl = c(lower,upper)
+ic_dl
+
+# Repete o processo para a outra companhia
+se = sd(ua$arr_delay) / sqrt(nrow(ua))
+mean(ua$arr_delay)
+
+lower = mean(ua$arr_delay) - 1.96 * se
+upper = mean(ua$arr_delay) + 1.96 * se
+ic_ua = c(lower,upper)
+ic_ua
+
+# Teste t
+# O teste t (de Student) foi desenvolvido por Willian Sealy Gosset em 1908 que usou o
+# pseudônimo “Student” em função da confidencialidade requerida por seu empregador
+# (cervejaria Guiness) que considerava o uso de estatística na manutenção da qualidade como
+# uma vantagem competitiva.
+# O teste t de Student tem diversas variações de aplicação, e pode ser usado na comparação 
+# de duas (e somente duas) médias e as variações dizem respeito às hipóteses que são testadas
+
+t.test(dl$arr_delay, ua$arr_delay, alternative="greater")
+
+# Regra
+# Baixo valor p: forte evidência empírica contra h0
+# Alto valor p: pouca ou nenhuma evidência empírica contra h0
+
+# Falhamos em rejeitar a hipótese nula, pois p-valor é maior que o nível de significância
+# Isso que dizer que há uma probabilidade alta de não haver diferença significativa entre os atrasos.
+# Para os nossos dados, não há evidência estatística de que a DL atrase mais que a UA.
 

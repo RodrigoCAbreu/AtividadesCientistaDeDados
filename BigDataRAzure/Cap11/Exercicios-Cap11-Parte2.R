@@ -16,4 +16,19 @@ summary(df)
 str(df)
 any(is.na(df)) #verificando valores vazios
 
-hist(df$G2)
+library(dplyr)
+
+#Obtendo apenas colunas numéricas
+
+colunas_numericas <- sapply(df, is.numeric)
+colunas_numericas
+
+#Filtrando as colunas numéricas para correlação
+
+data_cor <- cor(df[,colunas_numericas])
+data_cor
+
+# Pacotes para visualizar a análise de correlação
+installed.packages("corrgram")
+
+install.packages("corrplot")

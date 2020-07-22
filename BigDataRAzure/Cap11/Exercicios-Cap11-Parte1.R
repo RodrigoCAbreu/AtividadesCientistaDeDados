@@ -77,11 +77,15 @@ modelo
 
 # Calcule a reta de regressão
 
+y <- a + b*x
 
+reta <- 25.8134 - 0.9491 * Idade
 
 # Crie o gráfico da reta
 
 abline(modelo)
+
+lines(Idade, reta)
 
 # Exercício 3 - Relação entre altura e peso
 
@@ -118,6 +122,11 @@ b <- modelo1$coefficients[2]
 y <- a + b*alturas2
 View(y)
 
+#Outra forma
+
+previsao <- predict(modelo1,alturas2)
+previsao
+
 # Plot
 plot(alturas, pesos, pch = 16, cex = 1.3, 
      col = "blue", 
@@ -132,7 +141,7 @@ abline(lm(pesos ~ alturas))
 num <- length(alturas)
 num
 
-# Gerando um gráfico com os valores residuais
+# Gerando um gráfico com os valores residuais (erros do modelo)
 for (k in 1: num)  
   lines(c(alturas[k], alturas[k]), 
         c(pesos[k], pesos[k]))

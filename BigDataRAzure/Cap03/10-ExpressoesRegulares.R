@@ -28,7 +28,7 @@ grep("\\d", str, value = T)
 # grepl()
 ?grepl
 #Busca por padrões regulares retornando por false ou true, lista de padrões no PDF
-grepl("\\d+", str)
+grepl("\\d+", str)p
 grepl("\\D", str)
 
 
@@ -49,6 +49,7 @@ frase <- "Isso é uma string."
 regexpr(pattern = "u", frase)
 
 
+#Identifica a posição na frase
 # gregexpr()
 gregexpr(pattern = "u", frase)
 

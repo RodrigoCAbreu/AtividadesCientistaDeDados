@@ -8,7 +8,7 @@
 
 
 # Comecamos carregando o dataset de dados_treino
-dados_treino <- read.csv(choose.files())
+dados_treino <- read.csv('titanic-train.csv')
 View(dados_treino)
 
 # Analise exploratória de dados
@@ -78,5 +78,48 @@ missmap(dados_treino,
 
 # Exercício 1 - Crie o modelo de classificação e faça as previsões
 
+# Primeiro, uma limpeza nos dados
+str(dados_treino)
+head(dados_treino, 3)
+library(dplyr)
+dados_treino <- select(dados_treino, -PassengerId, -Name, -Ticket, -Cabin)
+head(dados_treino, 3)
+str(dados_treino)
+
+# Treine o modelo e depois faça as previsões
+log.model <- glm(formula = Survived ~ . , family = binomial(link = 'logit'), data = dados_treino)
+
+# Podemos ver que as variáveis Sex, Age e Pclass sao as variaveis mais significantes
+summary(log.model)
+
+# Fazendo as previsoes nos dados de teste
+library(caTools)
+set.seed(101)
+
+# Split dos dados
+split = sample.split(dados_treino$Survived, SplitRatio = 0.70)
+
+# Datasets de treino e de teste
+dados_treino_final = subset(dados_treino, split == TRUE)
+dados_teste_final = subset(dados_treino, split == FALSE)
+
+# Gerando o modelo com a versão final do dataset
+final.log.model <- glm(formula = Survived ~ . , family = binomial(link='logit'), data = dados_treino_final)
+
+# Resumo
+summary(final.log.model)
+
+# Prevendo a acurácia
+fitted.probabilities <- predict(final.log.model, newdata = dados_teste_final, type = 'response')
+
+# Calculando os valores
+fitted.results <- ifelse(fitted.probabilities > 0.5, 1, 0)
+
+# Conseguimos quase 80% de acurácia
+misClasificError <- mean(fitted.results != dados_teste_final$Survived)
+print(paste('Acuracia', 1-misClasificError))
+
+# Criando a confusion matrix
+table(dados_teste_final$Survived, fitted.probabilities > 0.5)
 
 

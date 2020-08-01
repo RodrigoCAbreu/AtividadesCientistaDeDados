@@ -1,15 +1,3 @@
-# Solução Lista de Exercícios - Capítulo 13
-
-# Obs: Caso tenha problemas com a acentuação, consulte este link:
-# https://support.rstudio.com/hc/en-us/articles/200532197-Character-Encoding
-
-# Configurando o diretório de trabalho
-# Coloque entre aspas o diretório de trabalho que você está usando no seu computador
-# Não use diretórios com espaço no nome
-setwd("C:/FCD/BigDataRAzure/Cap14")
-getwd()
-
-
 # Para este exemplo, usaremos o dataset Titanic do Kaggle. 
 # Este dataset é famoso e usamos parte dele nas aulas de SQL.
 # Ele normalmente é usado por aqueles que estão começando em Machine Learning.
@@ -20,7 +8,7 @@ getwd()
 
 
 # Comecamos carregando o dataset de dados_treino
-dados_treino <- read.csv('datasets/titanic-train.csv')
+dados_treino <- read.csv(choose.files())
 View(dados_treino)
 
 # Analise exploratória de dados

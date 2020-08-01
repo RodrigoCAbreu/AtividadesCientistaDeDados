@@ -1,14 +1,3 @@
-# Solução Lista de Exercícios - Capítulo 13
-
-# Obs: Caso tenha problemas com a acentuação, consulte este link:
-# https://support.rstudio.com/hc/en-us/articles/200532197-Character-Encoding
-
-# Configurando o diretório de trabalho
-# Coloque entre aspas o diretório de trabalho que você está usando no seu computador
-# Não use diretórios com espaço no nome
-setwd("C:/FCD/BigDataRAzure/Cap14")
-getwd()
-
 # Para este script, vamos usar o mlbench (Machine Learning Benchmark Problems)
 # https://cran.r-project.org/web/packages/mlbench/mlbench.pdf
 # Este pacote contém diversos datasets e usaremos um com os dados 
@@ -65,6 +54,8 @@ trainColNum <- grep("train",names(HouseVotes84))
 trainHouseVotes84 <- HouseVotes84[HouseVotes84$train == 1, -trainColNum]
 testHouseVotes84 <- HouseVotes84[HouseVotes84$train == 0, -trainColNum]
 
+class(trainHouseVotes84)
+
 # Invocando o método NaiveBayes
 install.packages("e1071")
 library(e1071)
@@ -73,5 +64,52 @@ library(e1071)
 
 # Treine o modelo
 ?naiveBayes
+
+trainModel <- naiveBayes(Class ~ ., data = trainHouseVotes84)
+
+# Visualizando o resultado
+trainModel
+summary(trainModel)
+str(trainModel)
+
+# Previsões
+nb_test_predict <- predict(trainModel, testHouseVotes84[,-1])
+
+# Crie a Confusion matrix
+table(pred = nb_test_predict, true = testHouseVotes84$Class)
+
+
+# Média
+mean(nb_test_predict == testHouseVotes84$Class)
+
+# Função para executar o registrar todos os resultados do modelo
+nb_multiple_runs <- function(train_fraction, n) {
+  fraction_correct <- rep(NA,n)
+  for (i in 1:n) {
+    HouseVotes84[,"train"] <- ifelse(runif(nrow(HouseVotes84))<train_fraction,1,0)
+    trainColNum <- grep("train", names(HouseVotes84))
+    trainHouseVotes84 <- HouseVotes84[HouseVotes84$train == 1,-trainColNum]
+    testHouseVotes84 <- HouseVotes84[HouseVotes84$train == 0,-trainColNum]
+    nb_model <- naiveBayes(Class ~ ., data = trainHouseVotes84)
+    nb_test_predict <- predict(nb_model, testHouseVotes84[,-1])
+    fraction_correct[i] <- mean(nb_test_predict == testHouseVotes84$Class)
+  }
+  return(fraction_correct)
+}
+
+# Executando o modelo 20 vezes
+fraction_correct_predictions <- nb_multiple_runs(0.8, 20)
+fraction_correct_predictions
+
+# Resumo dos resultados
+summary(fraction_correct_predictions)
+
+# Desvio padrão
+sd(fraction_correct_predictions)
+
+
+# Os resultados das execuções estão bem próximos, entre 0.87 e 0.95, 
+# com um desvio padrão de 0.02.
+# O Naive Bayes fez um bom trabalho com este conjunto de dados
 
 

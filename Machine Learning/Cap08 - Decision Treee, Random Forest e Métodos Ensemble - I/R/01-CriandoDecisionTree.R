@@ -1,12 +1,5 @@
 # Criando Árvore de Decisão com o pacote rpart
 
-# Obs: Caso tenha problemas com a acentuação, consulte este link:
-# https://support.rstudio.com/hc/en-us/articles/200532197-Character-Encoding
-
-# Definindo o diretório de trabalho
-getwd()
-setwd("~/Dropbox/DSA/MachineLearning2.0/Cap08/R")
-
 # Criando um dataframe
 ?expand.grid
 clima <- expand.grid(Tempo = c("Ensolarado","Nublado","Chuvoso"), 

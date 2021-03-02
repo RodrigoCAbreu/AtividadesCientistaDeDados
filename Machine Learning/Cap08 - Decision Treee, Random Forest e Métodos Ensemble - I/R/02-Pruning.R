@@ -1,12 +1,5 @@
 # Criando um árvore de decisão a partir do dataset titanic
 
-# Obs: Caso tenha problemas com a acentuação, consulte este link:
-# https://support.rstudio.com/hc/en-us/articles/200532197-Character-Encoding
-
-# Definindo o diretório de trabalho
-getwd()
-setwd("~/Dropbox/DSA/MachineLearning2.0/Cap08/R")
-
 # Gerando o dataset
 data(Titanic, package = "datasets") 
 
